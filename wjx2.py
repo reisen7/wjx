@@ -6,7 +6,7 @@ import traceback
 from threading import Thread
 import time
 from typing import List
-
+import json
 import numpy
 import requests
 from selenium import webdriver
@@ -43,9 +43,12 @@ from selenium.webdriver.common.by import By
 
 
 def zanip():
+    ip = ""
     # 这里放你的ip链接，选择你想要的地区，1分钟，ip池无所谓，数据格式txt，提取数量1，数量一定是1!其余默认即可
     api = "https://service.ipzan.com/core-extract?num=1&no=???&minute=1&area=all&pool=quality&secret=???"
-    ip = requests.get(api).text
+    # ip = requests.get(api).text
+
+    # print(f"获取到的代理ip为: {ip}")
     return ip
 
 
@@ -61,13 +64,42 @@ url = "https://www.wjx.cn/vm/OM6GYNV.aspx#"
 这个single_prob的"5"可以改成其他任何值，当然我不建议你这么干，因为问卷中只有5个单选题，所以第6个单选题的参数其实是没有用上的，参数只能多不能少！！！（这一点其他类型的概率参数也适用）
 """
 single_prob = {
-    "1": [1, 1, 0],
+    "1": -1,
     "2": -1,
     "3": -1,
     "4": -1,
     "5": -1,
-    "6": [1, 0],
+    "6": -1,
+    "7": -1,
+    "8": -1,
+    "9": -1,
+    "10": -1,
+    "11": -1,
+    "12": -1,
+    "13": -1,
+    "14": -1,
+    "15": -1,
+    "16": -1,
+    "17": -1,
+    "18": -1,
+    "19": -1,
+    "20": -1,
 }
+# single_prob = {
+#     "1": -1,
+#     "2": -1,
+#     "3": -1,
+#     "4": -1,
+#     "5": -1,
+#     "6": -1,
+#     "7": [1, 1, 1, 1, 96],
+#     "8": [1, 1, 1, 1, 96],
+#     "9": -1,
+#     "10": -1,
+#     "11": -1,
+#     "12": -1,
+#     "13": [25, 25, 25, 25, 0],
+# }
 
 # 下拉框参数，具体含义参考单选题，如果没有下拉框题也不要删，就让他躺在这儿吧，其他题也是哦，没有就不动他，别删，只改你有的题型的参数就好啦
 droplist_prob = {"1": [2, 1, 1]}
@@ -75,29 +107,42 @@ droplist_prob = {"1": [2, 1, 1]}
 # 此参数和视频演示不一致！！
 # 表示每个选项选择的概率，100表示必选，30表示选择B的概率为30；不能写[1,1,1,1]这种比例了，不然含义为选ABCD的概率均为1%
 # 最好保证概率和加起来大于100
-multiple_prob = {"9": [100, 30, 23, 43]}
+# multiple_prob = {
+#     "1": [42, 30, 28, 11, 11, 11, 11, 1, 1, 1, 0],
+#     "2": [32, 40, 28, 5, 5, 5, 5, 5, 0],
+#     "3": [32, 40, 28, 5, 5, 5, 5, 0],
+#     "4": [32, 40, 28, 5, 5, 5, 5, 5, 0],
+# }
+multiple_prob = {
+    "1": [42, 30, 28, 11],
+}
 # multiple_opts = {"9": 1, }   此参数已失效，可不必理会2024.3.28
 
 # 矩阵题概率参数,-1表示随机，其他含义参考单选题；同样的，题号不重要，保证第几个参数对应第几个矩阵小题就可以了；
 # 在示例问卷中矩阵题是第10题，每个小题都要设置概率值才行！！以下参数表示第二题随机，其余题全选A
 matrix_prob = {
-    "1": [1, 0, 0, 0, 0],
-    "2": -1,
-    "3": [1, 0, 0, 0, 0],
-    "4": [1, 0, 0, 0, 0],
-    "5": [1, 0, 0, 0, 0],
-    "6": [1, 0, 0, 0, 0],
+    "1": [10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
+    "2": [10, 20, 30, 40],
+    "3": [10, 10, 30, 40, 10],
+    "4": [10, 10, 30, 40, 10],
+    "5": [10, 10, 30, 40, 10],
 }
 
 # 量表题概率参数，参考单选题
-scale_prob = {"7": [0, 2, 3, 4, 1], "12": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]}
+scale_prob = {"7": [10, 10, 10, 10, 10, 10, 10, 10, 10, 10]}
 
 # 填空题参数，在题号后面按该格式填写需要填写的内容，
 texts = {
-    "8": ["内容1", "内容2", " 内容3"],
+    "1": [
+        "固定作息时间，强化生物钟规律​​",
+        "​​营造适宜的睡眠环境，减少外界干扰​",
+        "结合日间运动与阳光照射，调节生理节奏​",
+        "建立放松身心的睡前仪式，过渡至休息状态​",
+        "合理规划饮食与 caffeine 摄入，避免生理负担​",
+    ],
 }
 # 每个内容对应的概率1:1:1,
-texts_prob = {"8": [1, 1, 1]}
+texts_prob = {"1": [1, 1, 1, 1, 1]}
 
 # 排序题不支持设置参数，如果有排序题程序会自动处理
 # 滑块题没支持参数，程序能自动处理部分滑块题
@@ -121,14 +166,9 @@ matrix_prob = list(matrix_prob.values())
 scale_prob = list(scale_prob.values())
 texts_prob = list(texts_prob.values())
 texts = list(texts.values())
-print("="*50)
-print("本脚本专注问卷填写的自动化，数据质量并不总是可靠。")
-print("如若期望数据能通过SPSS/AMOS分析，可添加README.md的群聊管理员。")
-print("管理员可提供数据定制服务，分析指标包括但不限于:")
-print("✅信度检验: α>0.8 \n✅效度检验: KMO>0.8、Bartlett检验p<0.05 \n✅相关性分析: r=0.3~0.7、p<0.05")
-print("✅线性回归: R²>0.6、p<0.05\n✅独立/配对T检验: p<0.05 \n✅ANOVA方差分析: p<0.05 \n✅中介/调节: 交互项显著\n...")
-print("="*50)
-print("刷问卷的其他方法可以参考:http://sugarblack.top")
+
+print("所有按照比例刷题的脚本只能让问卷总体数据表面上看起来合理, 并不保证高信效度。")
+print("刷问卷的其他方法可以参考:  http://sugarblack.top  ")
 print("如果程序对你有帮助，请给我一个免费的 star 或 fork ~!")
 
 
@@ -164,19 +204,39 @@ def vacant(driver: WebDriver, current, index):
 
 # 单选题处理函数
 def single(driver: WebDriver, current, index):
-    xpath = f'//*[@id="div{current}"]/div[2]/div'
-    a = driver.find_elements(By.XPATH, xpath)
-    p = single_prob[index]
-    if p == -1:
-        r = random.randint(1, len(a))
-    else:
-        assert len(p) == len(
-            a
-        ), f"第{current}题参数长度：{len(p)},选项长度{len(a)},不一致！"
-        r = numpy.random.choice(a=numpy.arange(1, len(a) + 1), p=p)
-    driver.find_element(
-        By.CSS_SELECTOR, f"#div{current} > div.ui-controlgroup > div:nth-child({r})"
-    ).click()
+    try:
+        xpath = f'//*[@id="div{current}"]/div[2]/div'
+        a = driver.find_elements(By.XPATH, xpath)
+        if not a:  # 如果没找到选项元素
+            print(f"第{current}题没有找到选项元素")
+            return
+
+        p = single_prob[index] if index < len(single_prob) else -1
+        if p == -1:
+            r = random.randint(1, len(a))
+        else:
+            # 如果参数长度和选项长度不一致，自动截断或补齐参数
+            if isinstance(p, list):
+                if len(p) < len(a):
+                    # 参数少于选项，补齐为均匀概率
+                    p = p + [1 / (len(a))] * (len(a) - len(p))
+                    prob_sum = sum(p)
+                    p = [x / prob_sum for x in p]
+                elif len(p) > len(a):
+                    # 参数多于选项，截断
+                    p = p[: len(a)]
+                    prob_sum = sum(p)
+                    p = [x / prob_sum for x in p]
+                r = numpy.random.choice(a=numpy.arange(1, len(a) + 1), p=p)
+            else:
+                r = random.randint(1, len(a))
+
+        driver.find_element(
+            By.CSS_SELECTOR, f"#div{current} > div.ui-controlgroup > div:nth-child({r})"
+        ).click()
+    except Exception as e:
+        print(f"单选题第{current}题处理失败: {str(e)}")
+        raise
 
 
 # 下拉框处理函数
@@ -196,24 +256,71 @@ def droplist(driver: WebDriver, current, index):
 
 
 def multiple(driver: WebDriver, current, index):
-    xpath = f'//*[@id="div{current}"]/div[2]/div'
-    options = driver.find_elements(By.XPATH, xpath)
-    mul_list = []
-    p = multiple_prob[index]
-    assert len(options) == len(p), f"第{current}题概率值和选项值不一致"
-    # 生成序列,同时保证至少有一个1
-    while sum(mul_list) <= 1:
-        mul_list = []
-        for item in p:
-            a = numpy.random.choice(
-                a=numpy.arange(0, 2), p=[1 - (item / 100), item / 100]
+    try:
+        xpath = f'//*[@id="div{current}"]/div[2]/div'
+        options = driver.find_elements(By.XPATH, xpath)
+
+        if not options:
+            print(f"多选题第{current}题没有找到选项元素")
+            return
+
+        # 获取概率参数，如果索引超出范围则使用默认值
+        if index >= len(multiple_prob):
+            print(f"多选题第{current}题索引{index}超出参数范围，使用默认随机选择")
+            # 默认每个选项30%概率被选中
+            p = [30] * len(options)
+        else:
+            p = multiple_prob[index]
+
+        print(f"多选题第{current}题: 选项数量{len(options)}, 概率参数{p}")
+
+        # 自动适配参数长度
+        if len(options) != len(p):
+            print(
+                f"多选题第{current}题选项数量({len(options)})与概率参数数量({len(p)})不匹配，自动调整"
             )
-            mul_list.append(a)
-    # 依次点击
-    for index, item in enumerate(mul_list):
-        if item == 1:
-            css = f"#div{current} > div.ui-controlgroup > div:nth-child({index + 1})"
-            driver.find_element(By.CSS_SELECTOR, css).click()
+            if len(p) > len(options):
+                # 参数多于选项，截断
+                p = p[: len(options)]
+            else:
+                # 参数少于选项，补齐默认值30
+                p = p + [30] * (len(options) - len(p))
+
+        mul_list = []
+        # 生成序列,同时保证至少有一个1
+        attempt = 0
+        while sum(mul_list) <= 0 and attempt < 10:  # 防止无限循环
+            mul_list = []
+            for item in p:
+                prob = min(max(item / 100, 0), 1)  # 确保概率在0-1之间
+                a = numpy.random.choice(a=numpy.arange(0, 2), p=[1 - prob, prob])
+                mul_list.append(a)
+            attempt += 1
+
+        # 如果10次尝试后仍然没有选中任何选项，强制选中第一个
+        if sum(mul_list) <= 0:
+            print(f"多选题第{current}题随机选择失败，强制选中第一个选项")
+            mul_list[0] = 1
+
+        print(f"多选题第{current}题选择结果: {mul_list}")
+
+        # 依次点击
+        selected_count = 0
+        for option_index, item in enumerate(mul_list):
+            if item == 1:
+                try:
+                    css = f"#div{current} > div.ui-controlgroup > div:nth-child({option_index + 1})"
+                    driver.find_element(By.CSS_SELECTOR, css).click()
+                    selected_count += 1
+                    print(f"点击了第{option_index + 1}个选项")
+                except Exception as e:
+                    print(f"点击第{option_index + 1}个选项失败: {str(e)}")
+
+        print(f"多选题第{current}题共选择了{selected_count}个选项")
+
+    except Exception as e:
+        print(f"多选题第{current}题处理失败: {str(e)}")
+        raise
 
 
 # 矩阵题处理函数
@@ -226,18 +333,39 @@ def matrix(driver: WebDriver, current, index):
             q_num += 1
     # 选项数量
     xpath2 = f'//*[@id="drv{current}_1"]/td'
+    print(q_num)
     b = driver.find_elements(By.XPATH, xpath2)  # 题的选项数量+1 = 6
     # 遍历每一道小题
+    print(f"矩阵题第{current}题的选项数量（包含标题列）: {len(b)}")
+    print(f"实际可选择的选项数量: {len(b) - 1}")
     for i in range(1, q_num + 1):
-        p = matrix_prob[index]
-        index += 1
-        if p == -1:
-            opt = random.randint(2, len(b))
-        else:
-            opt = numpy.random.choice(a=numpy.arange(2, len(b) + 1), p=p)
-        driver.find_element(
-            By.CSS_SELECTOR, f"#drv{current}_{i} > td:nth-child({opt})"
-        ).click()
+        try:
+            p = matrix_prob[index] if index < len(matrix_prob) else -1
+            print(f"概率参数 p: {p}")
+            print(f"概率参数数组长度: {len(p) if isinstance(p, list) else '随机(-1)'}")
+            index += 1
+            if p == -1:
+                opt = random.randint(2, len(b))
+            else:
+                # 确保概率数组长度匹配
+                option_count = len(b) - 1
+                if isinstance(p, list):
+                    if len(p) != option_count:
+                        print(
+                            f"矩阵题第{current}题第{i}小题概率参数长度({len(p)})与选项数量({option_count})不匹配，使用随机"
+                        )
+                        opt = random.randint(2, len(b))
+                    else:
+                        opt = numpy.random.choice(a=numpy.arange(2, len(b) + 1), p=p)
+                else:
+                    opt = random.randint(2, len(b))
+
+            driver.find_element(
+                By.CSS_SELECTOR, f"#drv{current}_{i} > td:nth-child({opt})"
+            ).click()
+        except Exception as e:
+            print(f"矩阵题第{current}题第{i}小题处理失败: {str(e)}")
+            continue
     return index
 
 
@@ -280,36 +408,48 @@ def brush(driver: WebDriver):
     for j in q_list:  # 遍历每一页
         for k in range(1, j + 1):  # 遍历该页的每一题
             current += 1
-            # 判断题型 md, python没有switch-case语法
-            q_type = driver.find_element(
-                By.CSS_SELECTOR, f"#div{current}"
-            ).get_attribute("type")
-            if q_type == "1" or q_type == "2":  # 填空题
-                vacant(driver, current, vacant_num)
-                # 同时将vacant_num+1表示运行vacant函数时该使用texts参数的下一个值
-                vacant_num += 1
-            elif q_type == "3":  # 单选
-                single(driver, current, single_num)
-                # single_num+1表示运行single函数时该使用single_prob参数的下一个值
-                single_num += 1
-            elif q_type == "4":  # 多选
-                multiple(driver, current, multiple_num)
-                multiple_num += 1
-            elif q_type == "5":  # 量表题
-                scale(driver, current, scale_num)
-                scale_num += 1
-            elif q_type == "6":  # 矩阵题
-                matrix_num = matrix(driver, current, matrix_num)
-            elif q_type == "7":  # 下拉框
-                droplist(driver, current, droplist_num)
-                droplist_num += 1
-            elif q_type == "8":  # 滑块题
-                score = random.randint(1, 100)
-                driver.find_element(By.CSS_SELECTOR, f"#q{current}").send_keys(score)
-            elif q_type == "11":  # 排序题
-                reorder(driver, current)
-            else:
-                print(f"第{k}题为不支持题型！")
+            try:
+                # 先检查题目是否存在（可能因为跳题逻辑被隐藏）
+                element = driver.find_element(By.CSS_SELECTOR, f"#div{current}")
+                if not element.is_displayed():
+                    print(f"第{current}题被隐藏，跳过")
+                    continue
+
+                # 判断题型 md, python没有switch-case语法
+                q_type = element.get_attribute("type")
+                print(f"处理第{current}题，题型: {q_type}")
+
+                if q_type == "1" or q_type == "2":  # 填空题
+                    vacant(driver, current, vacant_num)
+                    vacant_num += 1
+                elif q_type == "3":  # 单选
+                    single(driver, current, single_num)
+                    single_num += 1
+                elif q_type == "4":  # 多选
+                    multiple(driver, current, multiple_num)
+                    multiple_num += 1
+                elif q_type == "5":  # 量表题
+                    scale(driver, current, scale_num)
+                    scale_num += 1
+                elif q_type == "6":  # 矩阵题
+                    matrix_num = matrix(driver, current, matrix_num)
+                elif q_type == "7":  # 下拉框
+                    droplist(driver, current, droplist_num)
+                    droplist_num += 1
+                elif q_type == "8":  # 滑块题
+                    score = random.randint(1, 100)
+                    driver.find_element(By.CSS_SELECTOR, f"#q{current}").send_keys(
+                        str(score)
+                    )
+                elif q_type == "11":  # 排序题
+                    reorder(driver, current)
+                else:
+                    print(f"第{current}题为不支持题型: {q_type}")
+
+            except Exception as e:
+                print(f"第{current}题处理失败，跳过: {str(e)}")
+                # 如果题目不存在或处理失败，继续下一题
+                continue
         time.sleep(0.5)
         #  一页结束过后要么点击下一页，要么点击提交
         try:
@@ -405,7 +545,7 @@ def run(xx, yy):
 # 多线程执行run函数
 if __name__ == "__main__":
     # 一个可以代刷问卷星的网站： http://sugarblack.top
-    target_num = 3  # 目标份数
+    target_num = 54  # 目标份数
     # 失败阈值，数值可自行修改为固定整数
     fail_threshold = target_num / 4 + 1
     cur_num = 0  # 已提交份数
@@ -418,7 +558,7 @@ if __name__ == "__main__":
         use_ip = True
     else:
         print("IP设置失败, 将使用本机ip填写")
-    num_threads = 2  # 窗口数量
+    num_threads = 3  # 窗口数量
     threads: list[Thread] = []
     # 创建并启动线程
     for i in range(num_threads):
